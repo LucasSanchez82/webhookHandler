@@ -1,7 +1,7 @@
 import fs from "fs";
 
 export default class Log {
-  static filePath = "logq.json";
+  static filePath = "logs.json";
   static getJson() {
     return JSON.parse(fs.readFileSync(Log.filePath, "utf8")) ?? [];
   }

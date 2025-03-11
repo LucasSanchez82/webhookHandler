@@ -8,6 +8,9 @@ export default function updateManweb() {
   Log.add(`Updating Next.js application at ${path}`);
 
   try {
+    Log.add("Resetting local changes...");
+    execSync("git reset --hard HEAD", { cwd: path, stdio: "inherit" });
+
     Log.add("Pulling latest changes from git...");
     execSync("git pull", { cwd: path, stdio: "inherit" });
 
@@ -30,5 +33,3 @@ export default function updateManweb() {
     throw error;
   }
 }
-
-updateManweb();
