@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express";
 import bodyParser from "body-parser";
 import Log from "./utils/Log";
+import updateManweb from "./updateManweb";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ app.post("/manwebv2", (req: Request, res: Response) => {
   if (event === "push" && payload.ref === "refs/heads/prod") {
     console.log("Received a push event for the prod branch");
     Log.add("Received a push event for the prod branch");
+    updateManweb();
   } else Log.add("Received an other event than the prod branch");
 
   res.status(200).send("Webhook received");
