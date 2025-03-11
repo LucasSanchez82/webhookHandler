@@ -14,8 +14,6 @@ app.post("/manwebv2", (req: Request, res: Response) => {
   if (event === "push" && payload.ref === "refs/heads/prod") {
     console.log("Received a push event for the prod branch");
     Log.add("Received a push event for the prod branch");
-    Log.add(`Payload: ${JSON.stringify(payload, null, 2)}`);
-    Log.add("headers: " + JSON.stringify(req.headers, null, 2));
   } else Log.add("Received an other event than the prod branch");
 
   res.status(200).send("Webhook received");
