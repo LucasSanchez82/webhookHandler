@@ -1,35 +1,57 @@
-import { execSync } from "child_process";
 import Log from "./utils/Log";
+import { spawn } from "child_process";
 
-export default function updateManweb() {
+export default async function updateManweb(): Promise<boolean> {
   const path = process.env.manwebPath;
   if (!path) throw new Error("no manwebPath provided in Environment variables");
 
   Log.add(`Updating Next.js application at ${path}`);
 
+  const execCommand = (command: string, args: string[] = []): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(command, args, {
+        cwd: path,
+        stdio: "inherit",
+      });
+
+      childProcess.on("error", (err) => {
+        reject(err);
+      });
+
+      childProcess.on("close", (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(
+            new Error(
+              `Command ${command} ${args.join(" ")} failed with code ${code}`
+            )
+          );
+        }
+      });
+    });
+  };
+
   try {
     Log.add("Resetting local changes...");
-    execSync("git reset --hard HEAD", { cwd: path, stdio: "inherit" });
+    await execCommand("git", ["reset", "--hard", "HEAD"]);
 
     Log.add("Pulling latest changes from git...");
-    execSync("git pull", { cwd: path, stdio: "inherit" });
+    await execCommand("git", ["pull"]);
 
     Log.add("Installing dependencies...");
-    execSync("bun install", { cwd: path, stdio: "inherit" });
+    await execCommand("bun", ["install"]);
 
     Log.add("Building application...");
-    execSync("bun run build", { cwd: path, stdio: "inherit" });
+    await execCommand("bun", ["run", "build"]);
 
     Log.add("Restarting application...");
-    execSync(`pm2 restart ${path}/ecosystem.config.cjs`, {
-      cwd: path,
-      stdio: "inherit",
-    });
+    await execCommand("pm2", ["restart", `${path}/ecosystem.config.cjs`]);
 
     Log.add("Update completed successfully");
     return true;
   } catch (error) {
     Log.add("Error updating Next.js application: \n" + error);
-    throw error;
+    return false;
   }
 }
