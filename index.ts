@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post("/webhook", (req: Request, res: Response) => {
+app.post("/manwebv2", (req: Request, res: Response) => {
   const event = req.headers["x-github-event"];
   const payload = req.body;
 
