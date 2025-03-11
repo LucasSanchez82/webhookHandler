@@ -19,9 +19,10 @@ app.post("/manwebv2", (req: Request, res: Response) => {
     res
       .status(isSuccesful ? 200 : 500)
       .send(isSuccesful ? "Update successful" : "Update failed");
+  } else {
+    Log.add("Received an other event than the prod branch");
+    res.status(200).send("Received an other event than the prod branch");
   }
-  Log.add("Received an other event than the prod branch");
-  res.status(200).send("Received an other event than the prod branch");
 });
 
 app.listen(port, () => {
