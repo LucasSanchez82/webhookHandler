@@ -8,14 +8,14 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post("/manwebv2", async (req: Request, res: Response) => {
+app.post("/manwebv2", (req: Request, res: Response) => {
   const event = req.headers["x-github-event"];
   const payload = req.body;
 
   if (event === "push" && payload.ref === "refs/heads/prod") {
     console.log("Received a push event for the prod branch");
     Log.add("Received a push event for the prod branch");
-    const isSuccesful = await updateManweb();
+    const isSuccesful = updateManweb();
     res
       .status(isSuccesful ? 200 : 500)
       .send(isSuccesful ? "Update successful" : "Update failed");
