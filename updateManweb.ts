@@ -1,7 +1,10 @@
-import { execSync } from "child_process";
+import { exec } from "child_process";
+import { promisify } from "util";
 import Log from "./utils/Log";
 
-export default function updateManweb() {
+const execAsync = promisify(exec);
+
+export default async function updateManweb(): Promise<boolean> {
   const path = process.env.manwebPath;
   if (!path) throw new Error("no manwebPath provided in Environment variables");
 
@@ -9,22 +12,19 @@ export default function updateManweb() {
 
   try {
     Log.add("Resetting local changes...");
-    execSync("git reset --hard HEAD", { cwd: path, stdio: "inherit" });
+    await execAsync("git reset --hard HEAD", { cwd: path });
 
     Log.add("Pulling latest changes from git...");
-    execSync("git pull", { cwd: path, stdio: "inherit" });
+    await execAsync("git pull", { cwd: path });
 
     Log.add("Installing dependencies...");
-    execSync("bun install", { cwd: path, stdio: "inherit" });
+    await execAsync("bun install", { cwd: path });
 
     Log.add("Building application...");
-    execSync("bun run build", { cwd: path, stdio: "inherit" });
+    await execAsync("bun run build", { cwd: path });
 
     Log.add("Restarting application...");
-    execSync(`pm2 restart ${path}/ecosystem.config.cjs`, {
-      cwd: path,
-      stdio: "inherit",
-    });
+    await execAsync(`pm2 restart ${path}/ecosystem.config.cjs`, { cwd: path });
 
     Log.add("Update completed successfully");
     return true;

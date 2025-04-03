@@ -15,10 +15,10 @@ app.post("/manwebv2", (req: Request, res: Response) => {
   if (event === "push" && payload.ref === "refs/heads/prod") {
     console.log("Received a push event for the prod branch");
     Log.add("Received a push event for the prod branch");
-    const isSuccesful = updateManweb();
-    res
-      .status(isSuccesful ? 200 : 500)
-      .send(isSuccesful ? "Update successful" : "Update failed");
+    updateManweb().then((isSuccesful) => {
+      Log.add(isSuccesful ? "Update successful" : "Update failed");
+    });
+    res.send("Update in progress");
   } else {
     Log.add("Received an other event than the prod branch");
     res.status(200).send("Received an other event than the prod branch");
